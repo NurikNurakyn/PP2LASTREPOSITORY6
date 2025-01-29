@@ -1,13 +1,8 @@
-a = 1
+print("Hello, World!")
 
-print(a)
+#This is a comment.
+print("Hello, World!")
 
-print(1)
-
-print("Hello",'World'+"!")
-
-b = "\nFirst code"
-print(b)
-
-print(1 + 3)
-a = 1
+"""This is a
+multiline docstring."""
+print("Hello, World!")
