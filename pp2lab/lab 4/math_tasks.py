@@ -1,5 +1,5 @@
 import math
-'''
+
 #1 Write a Python program to convert degree to radian.
 degree = int(input('Input degree: '))
 radian = math.radians(degree)
@@ -11,7 +11,7 @@ a = int(input('Base, first value: '))
 b = int(input('Base, second value: '))
 area = h*((a+b)/2)
 print('Expected Output:',round(area,2))
-'''
+
 #3 Write a Python program to calculate the area of regular polygon.
 n = int(input('Input number of sides:'))
 s = int(input('Input the length of a side:'))
