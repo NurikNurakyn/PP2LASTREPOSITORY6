@@ -75,7 +75,7 @@ movies = [
 "category": "Romance"
 }
 ]
-'''
+
 #1 Write a function that takes a single movie and returns True if its IMDB score is above 5.5
 def above_55(movies,movie_name):
     for movie in movies:
@@ -127,4 +127,3 @@ def avg_imdb_category(movies,movie_category):
 
 movie_category = input()
 print(avg_imdb_category(movies,movie_category))
-'''
