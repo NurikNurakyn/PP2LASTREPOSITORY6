@@ -811,4 +811,4 @@ for i in sample_data_json["imdata"]:
     speed = attributes['speed']
     mtu = attributes["mtu"]
 
-    print(f"{dn:50} {descr:20} {speed:11} {mtu:6}")
+    print(f"{dn:50} {descr:20} {speed:11} {mtu:6}") 
