@@ -19,12 +19,12 @@ print(without_microsecond)
 
 
 #4 Write a Python program to calculate two date difference in seconds.
-y = int(input("Enter the first year: "));y1 = int(input("Enter the second year: "))
-m = int(input("Enter the first month: "));m1 = int(input("Enter the second month: "))
-d = int(input("Enter the first day: "));d1 = int(input("Enter the second day: "))
-h = int(input("Enter the first hour: "));h1 = int(input("Enter the second hour: "))
-min = int(input("Enter the first minute: "));min1 = int(input("Enter the second minute: "))
-sec = int(input("Enter the first second: "));sec1 = int(input("Enter the second second: "))
+y = int(input("Enter the first year: ")) ; y1 = int(input("Enter the second year: "))
+m = int(input("Enter the first month: ")) ; m1 = int(input("Enter the second month: "))
+d = int(input("Enter the first day: ")) ; d1 = int(input("Enter the second day: "))
+h = int(input("Enter the first hour: ")) ; h1 = int(input("Enter the second hour: "))
+min = int(input("Enter the first minute: ")) ; min1 = int(input("Enter the second minute: "))
+sec = int(input("Enter the first second: ")) ; sec1 = int(input("Enter the second second: "))
 first_date = datetime(y,m,d,h,min,sec)
 print(first_date)
 second_date = datetime(y1,m1,d1,h1,min1,sec1)
