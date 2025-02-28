@@ -84,7 +84,7 @@ if os.path.exists(path):
         print("It is writability")
     elif os.access(path,os.X_OK):
         print("It is executability")
-
+os.remove(path)
 
 
 
