@@ -1,208 +1,128 @@
-"""import pygame as py
-import time
+import pygame
 import random
 
-py.init()
-def our_snake(snake_block, snake_list):
-    for x in snake_list:
-        py.draw.rect(screen, BLACK, [x[0], x[1], snake_block, snake_block])
+pygame.init() #инициация пайгейм
 
+WIDTH = 800
+HEIGHT = 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT)) #окно игры
+pygame.display.set_caption('Snake') #название окна
+clock = pygame.time.Clock() # для стабилизации фпс и скорости игры
+snake_position = 10 # размер змейки
+font_style = pygame.font.SysFont("Century",25) #вид текста когда проигрываем ,шрифт
+score_font = pygame.font.SysFont("Arial",35) #вид текста счетчика уровня и еды
+pygame.mixer.init()
 
-WIDTH = 800 #Ширина игрового экрана
-HEIGHT = 600 #Длина игрового экрана
-x = 400 #Стартовые координаты змеи по оси х
-y = 300 #Стартовые координаты змеи по оси у
-x_step = 0 #шаг за определенное время с time по оси х
-y_step = 0 #шаг за определенное время с time по оси у
-x1 = random.randint(5, 595) #рандомные координаты появления яблоки
-y1 = random.randint(5, 595) #рандомные координаты появления яблоки
+eat_sound = pygame.mixer.Sound("sounds/5e9cc940c9e1cc1.mp3")  #звук еды
+game_over_sound = pygame.mixer.Sound("sounds/8d3b1fa30e92ead.mp3")  #звук проигрыша
+game_over_sound.set_volume(0.1)
+def score_apple(score, level): #функция для текста счетчика
+    value = score_font.render(f"Score: {score}    Level: {level}", True, (255,255,255)) #рендер рисует текст со счетом
+    screen.blit(value, [10,10])  # позиция счетчика
 
-WHITE = (0, 0, 0) #белый
-RED = (224, 0, 0) #красный
-BLACK = (255, 255, 255) #черный
-GREEN = (0, 204, 100) #немного черноватый зеленый
-YELLOW = (235, 204, 52) #делтый
-snake_speed = 7 #скорость изменения координат змеи
+def our_snake(snake, snake_list): #функция самой змейки
+    for x in snake_list: #лист имеет все позиции части змейки
+        pygame.draw.rect(screen, (200,0,50), [x[0],x[1], snake,snake]) #отрисовываем части змейки в каждой позиции
 
-screen = py.display.set_mode((WIDTH, HEIGHT))
-background = py.image.load("images/background_snake.jpg")
-py.display.set_caption("Snake")
-icon = py.image.load("images/snake_icon.png")
-py.display.set_icon(icon)
+def message(msg, color): #когда проигрываем
+    mesg = font_style.render(msg,True, color) # вид текста
+    screen.blit(mesg,[WIDTH/6, HEIGHT/3]) #положение текста
 
-t = py.time.Clock() #для скорости игры и фпс стабильной
+def generate_food(snake_list): #создание еды
+    while True:
+        fx = round(random.randrange(0,WIDTH-snake_position)/10.0)*10 #положение еды в координате х(раунд и умножение и деление на 10 для того чтобы еда появлялся в правильной позиции чтобы змейка и еда были в одной позиции)
+        fy = round(random.randrange(0,HEIGHT-snake_position)/10.0)*10 #положение еды в координате у
+        if [fx, fy] not in snake_list: #чтобы еда не появилось в нашем теле
+            return fx, fy
 
-font_style = py.font.SysFont(None, 50)
+def gameLoop(): #настройки и цикл самой игры
+    pygame.mixer.music.load("sounds/60da2b0c2e41b44.mp3")  # фоновая музыка
+    pygame.mixer.music.play(-1)  # бесконечный повтор
+    game_over = False #проверка завершения игры
+    game_close = False #проверка проигрыша
+    x1 = WIDTH / 2 #позиция змейки в начале игры
+    y1 = HEIGHT / 2 #позиция змейки в начале игры
+    x1_change = 0 #изменение координат змейки
+    y1_change = 0 #изменение координат змейки
+    snake_length = [] #сохраняем здесь тело(длину) змейки
+    length = 1 #начальная длина
+    level = 1 #начальный уровень
+    speed = 10 #скорость изменения позиции змейки
+    fx,fy = generate_food(snake_length) #рандомная генерация еды
 
-def mess(msg, color):
-    m = font_style.render(msg, True, color)
-    screen.blit(m, [WIDTH / 3, HEIGHT / 3])
+    while not game_over: #пока игра не завершится
+        while game_close: #пока не проиграем
+            pygame.mixer.music.stop()  #фоновая музыка в паузе
+            pygame.mixer.Sound.play(game_over_sound)  #звук проигрыша
 
-snake_lenght_list = [] #сохраняем длину змеи
-snake_lenght = 1
-fx = random.randrange(0, WIDTH - snake_speed)
-fy = random.randrange(0, HEIGHT - snake_speed)
-running = True
-def game():
-    while running:
-        screen.blit(background, (0, 0))
+            screen.fill((0 ,200,100)) #цвет заднего фона
+            message("You lose! Tap E for exit or R for restart",(255,255,255)) #параметры функции мессейдж
+            pygame.display.update() #обновляем экран
+            for event in pygame.event.get(): #событии
+                if event.type==pygame.QUIT: #закрытие окна
+                    game_over=True
+                    game_close=False
+                if event.type==pygame.KEYDOWN: #событие с клавишами
+                    if event.key==pygame.K_e: #если нажимаем е игра заканчивается и окно закрывается
+                        game_over=True
+                        game_close=False
+                    if event.key ==pygame.K_r: #если нажимаем r(к) игра возобновляется и функция геймлуп начинается с самого начало
 
-        for event in py.event.get():
-            if event.type == py.QUIT:
-                running = False
-            if event.type == py.KEYDOWN:
-                if event.key == py.K_RIGHT:
-                    x_step = snake_speed
-                    y_step = 0
-                elif event.key == py.K_LEFT:
-                    x_step = -snake_speed
-                    y_step = 0
-                elif event.key == py.K_UP:
-                    x_step = 0
-                    y_step = -snake_speed
-                elif event.key == py.K_DOWN:
-                    x_step = 0
-                    y_step = snake_speed
-                elif event.key == py.K_r:
-                    game()
-                elif event.key == py.K_q:
-                    running = False
+                        gameLoop()
 
-        if x >= 800 or x <= 0 or y >= 600 or y <= 0:
-            running = False
+        for event in pygame.event.get(): #событии
+            if event.type == pygame.QUIT: #закрытие окна
+                game_over=True
+            if event.type == pygame.KEYDOWN: #событие с клавишами
+                if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and x1_change == 0: #проверка нажатие a или стрелки влево ← и чтобы змейка не повернулся назад на 180 градусов
+                    x1_change = -snake_position #здесь получается -10 и это изменение позиции по оси х
+                    y1_change = 0 #чтобы змейка не двигалась по оси у
+                elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and x1_change ==0:
+                    x1_change = snake_position
+                    y1_change = 0
+                elif (event.key == pygame.K_UP or event.key == pygame.K_w) and y1_change==0: #роверка нажатия w или стрелки вверх ↑  и чтобы змейка не двигалась вниз
+                    y1_change = -snake_position #изменение позиции змейки по оси у
+                    x1_change = 0 #чтобы змейка не пошел по оси х
+                elif (event.key == pygame.K_DOWN or event.key == pygame.K_s) and y1_change == 0:
+                    y1_change =snake_position
+                    x1_change = 0
 
-        snake_Head = [x1, y1]
-        snake_lenght_list.append(snake_Head)
+        if x1 >=WIDTH or x1<0 or y1>=HEIGHT or y1<0: #проверка если змейка выходит за границы окна игра заканчивается
+            pygame.mixer.Sound.play(game_over_sound)
+            game_close = True
 
-        if len(snake_lenght_list) > snake_lenght:
-            del snake_lenght_list[0]
+        x1 += x1_change #изменение позиции змейки по оси х
+        y1 += y1_change #измененная позиция змейки по оис у
+        screen.fill((0,200,100)) #после каждой изменении позиции задний фон оставалась зеленой без этого каждая позиция где была змейка будет красной
+        pygame.draw.rect(screen,(255,255,0),[fx,fy,snake_position,snake_position])  #рисует еду
 
-        for segment in snake_lenght_list[:-1]:
-            if segment == snake_Head:
-                running = False
+        snake_head = [x1,y1] #список с текущими координатами головы змейки
+        snake_length.append(snake_head) #добавляем новую часть тело змейке в список частей тел
 
-        our_snake(snake_speed, snake_lenght_list)
-        py.display.update()
+        if len(snake_length) >length: #чтобы змейка увеличивалась с хвоста а не с головы
+            del snake_length[0]
 
-        if x1 == fx and y1 == fy:
-            fx = random.randrange(0, WIDTH - snake_speed)
-            fy = random.randrange(0, HEIGHT - snake_speed)
-            snake_lenght += 1
+        for x in snake_length[:-1]: #проверка положения змейки если любая его часть будет внутри змейки игра заканчивается точнее если мы столкнемся с самим собой
+            if x == snake_head:
+                pygame.mixer.Sound.play(game_over_sound)
+                game_close = True
 
-        x += x_step
-        y += y_step
+        our_snake(snake_position,snake_length) #параметры функции измененные
+        score_apple(length-1,level) #параметры функции измененные
+        pygame.display.update() #обновление экрана
 
-        mess("You lose", RED)
-        py.draw.rect(screen, RED, [x, y, 15, 15]) #наша змейка
-        py.draw.rect(screen, YELLOW, [fx, fy, 20, 20]) #наша еда
-        py.display.update()
-        t.tick(30) #фпс в секунду
+        if x1 == fx and y1 == fy: #если наши координаты и координаты еды будут равны мы сьедаем еду
+            fx,fy =generate_food(snake_length) #создает новую еду в новом положении
+            length +=1 #длина увеличивается
+            pygame.mixer.Sound.play(eat_sound) #звук сьедания еда
+            if length %3 == 0: #после каждой 3 еды игра становится сложнее
+                level +=1
+                speed +=2
 
-    py.quit()
+        clock.tick(speed) #скорость игры и фпс
 
-game()"""
-import pygame as py
-import time
-import random
+    pygame.quit() #закрытие игры после его окончания
+    quit()
 
-py.init()
+gameLoop()
 
-
-def game():
-    WIDTH = 800 #Ширина игрового экрана
-    HEIGHT = 600 #Длина игрового экрана
-    x = 400 #Стартовые координаты змеи по оси х
-    y = 300 #Стартовые координаты змеи по оси у
-    x_step = 0 #шаг за определенное время с time по оси х
-    y_step = 0 #шаг за определенное время с time по оси у
-    x1 = random.randint(5, 595) #рандомные координаты появления яблоки
-    y1 = random.randint(5, 595) #рандомные координаты появления яблоки
-
-    WHITE = (0, 0, 0) #белый
-    RED = (224, 0, 0) #красный
-    BLACK = (255, 255, 255) #черный
-    GREEN = (0, 204, 100) #немного черноватый зеленый
-    YELLOW = (235, 204, 52) #делтый
-    snake_speed = 7 #скорость изменения координат змеи
-
-    screen = py.display.set_mode((WIDTH, HEIGHT))
-    background = py.image.load("images/background_snake.jpg")
-    py.display.set_caption("Snake")
-    icon = py.image.load("images/snake_icon.png")
-    py.display.set_icon(icon)
-
-    def our_snake(snake_block, snake_list):
-        for x in snake_list:
-            py.draw.rect(screen, BLACK, [x[0], x[1], snake_block, snake_block])
-
-    t = py.time.Clock() #для скорости игры и фпс стабильной
-
-    font_style = py.font.SysFont(None, 50)
-
-    def mess(msg, color):
-        m = font_style.render(msg, True, color)
-        screen.blit(m, [WIDTH / 3, HEIGHT / 3])
-
-    snake_lenght_list = [] #сохраняем длину змеи
-    snake_lenght = 1
-    fx = random.randrange(0, WIDTH - snake_speed)
-    fy = random.randrange(0, HEIGHT - snake_speed)
-    running = True
-
-    while running:
-        screen.blit(background, (0, 0))
-
-        for event in py.event.get():
-            if event.type == py.QUIT:
-                running = False
-            if event.type == py.KEYDOWN:
-                if event.key == py.K_RIGHT:
-                    x_step = snake_speed
-                    y_step = 0
-                elif event.key == py.K_LEFT:
-                    x_step = -snake_speed
-                    y_step = 0
-                elif event.key == py.K_UP:
-                    x_step = 0
-                    y_step = -snake_speed
-                elif event.key == py.K_DOWN:
-                    x_step = 0
-                    y_step = snake_speed
-                elif event.key == py.K_r:
-                    game()
-                elif event.key == py.K_q:
-                    running = False
-
-        if x >= 800 or x <= 0 or y >= 600 or y <= 0:
-            running = False
-
-        snake_Head = [x, y]
-        snake_lenght_list.append(snake_Head)
-
-        if len(snake_lenght_list) > snake_lenght:
-            del snake_lenght_list[0]
-
-        for segment in snake_lenght_list[:-1]:
-            if segment == snake_Head:
-                running = False
-
-        our_snake(snake_speed, snake_lenght_list)
-        py.display.update()
-
-        if x == fx and y == fy:
-            fx = random.randrange(0, WIDTH - snake_speed)
-            fy = random.randrange(0, HEIGHT - snake_speed)
-            snake_lenght += 1
-
-        x += x_step
-        y += y_step
-
-        mess("You lose", RED)
-        py.draw.rect(screen, RED, [x, y, 15, 15]) #наша змейка
-        py.draw.rect(screen, YELLOW, [fx, fy, 20, 20]) #наша еда
-        py.display.update()
-        t.tick(30) #фпс в секунду
-
-    py.quit()
-
-game()
