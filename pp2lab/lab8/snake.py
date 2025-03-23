@@ -14,8 +14,8 @@ score_font = pygame.font.SysFont("Cambria",35) #вид текста счетчи
 
 pygame.mixer.init()
 
-eat_sound = pygame.mixer.Sound("sounds/5e9cc940c9e1cc1.mp3")  #звук еды
-game_over_sound = pygame.mixer.Sound("sounds/8d3b1fa30e92ead.mp3")  #звук проигрыша
+eat_sound = pygame.mixer.Sound("sounds_for_snake/5e9cc940c9e1cc1.mp3")  #звук еды
+game_over_sound = pygame.mixer.Sound("sounds_for_snake/8d3b1fa30e92ead.mp3")  #звук проигрыша
 game_over_sound.set_volume(0.1)
 def score_apple(score, level): #функция для текста счетчика
     value = score_font.render(f"Score: {score}    Level: {level}", True, (255,255,255)) #рендер рисует текст со счетом
@@ -39,7 +39,7 @@ def generate_food(snake_list): #создание еды
 def main_menu(): #главное меню
     running = True
     while running:
-        menu_background = pygame.image.load("images/41524.jpg") #задний фон меню
+        menu_background = pygame.image.load("images_for_snake/41524.jpg") #задний фон меню
         screen.blit(menu_background,(0,0)) #расположение меню
         game_name_font = pygame.font.SysFont("Cambria",40) #шрифт и размер шрифта
         points_font = pygame.font.SysFont("Cambria",30) #шрифт и размер шрифта
@@ -83,7 +83,7 @@ def pause():
 
 
 def gameLoop():  # настройки и цикл самой игры
-    pygame.mixer.music.load("sounds/60da2b0c2e41b44.mp3")  # фоновая музыка
+    pygame.mixer.music.load("sounds_for_snake/60da2b0c2e41b44.mp3")  # фоновая музыка
     pygame.mixer.music.play(-1)  # бесконечный повтор
     game_over = False  # проверка завершения игры
     game_close = False  # проверка проигрыша
