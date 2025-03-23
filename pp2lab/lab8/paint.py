@@ -3,7 +3,7 @@ import pygame
 #Инициализация Pygame
 pygame.init()
 
-#Настройки окна
+#Настройки окна#
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Paint App")

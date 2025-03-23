@@ -76,10 +76,10 @@ py.display.set_caption("Clock of Mickey")
 #sound of clock
 py.mixer.init()
 py.mixer.music.load("music/zvuk-strelok-chasov-1-min-24125.mp3")
-py.mixer.music.play()
+py.mixer.music.play(-1)
 
 
-minutes_hand = py.transform.scale(minute_hand, (500, 500))
+minutes_hand = py.transform.scale(minute_hand, (500, 500)) #изменить размер до нового разрешения
 seconds_hand = py.transform.scale(second_hand, (700, 700))
 
 center_x, center_y = 400, 300
@@ -95,13 +95,13 @@ def draw_clock():
     minute_angle = - (minute * 6)
     second_angle = - (second * 6)
 
-    rotated_minute = py.transform.rotate(minute_hand, minute_angle)
+    rotated_minute = py.transform.rotate(minute_hand, minute_angle) #поворачивает изображение на заданный угол
     rotated_second = py.transform.rotate(second_hand, second_angle)
 
-    minute_rect = rotated_minute.get_rect(center=(center_x, center_y))
+    minute_rect = rotated_minute.get_rect(center=(center_x, center_y)) #get_rect создает новый прямоугольник с размером изображения в центре экрана чтобы наш рисунок не сместился в другие координаты
     second_rect = rotated_second.get_rect(center=(center_x, center_y))
 
-    screen.blit(rotated_minute, minute_rect.topleft)
+    screen.blit(rotated_minute, minute_rect.topleft) #тopleft поможет разместить стрелки корректно.
     screen.blit(rotated_second, second_rect.topleft)
 
 running = True

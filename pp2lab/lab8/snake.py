@@ -60,7 +60,7 @@ def main_menu(): #главное меню
                 elif event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     quit()
-
+#
 def pause():
     pause = True
     pygame.mixer.music.pause()
