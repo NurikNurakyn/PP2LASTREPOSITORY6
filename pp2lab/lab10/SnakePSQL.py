@@ -23,7 +23,6 @@ def get_or_create_user(username):
         user_id = cur.fetchone()[0]
         conn.commit()
 
-    # Check or create score entry
     cur.execute("SELECT level, score FROM user_scores WHERE user_id = %s", (user_id,))
     score_data = cur.fetchone()
     if not score_data:

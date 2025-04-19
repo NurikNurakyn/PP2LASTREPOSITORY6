@@ -24,7 +24,7 @@ def insert_from_csv(path):
         for row in reader:
             cur.execute("INSERT INTO phonebook (username, phone) VALUES (%s, %s)", (row['username'], row['phone']))
     conn.commit()
-    print("Data from CSV has been inserted.")
+    print("📥 Data from CSV has been inserted.")
 
 
 def insert_from_console():
@@ -40,7 +40,7 @@ def update_user():
     new_phone = input("Enter the new phone number: ")
     cur.execute("UPDATE phonebook SET phone = %s WHERE username = %s", (new_phone, username))
     conn.commit()
-    print("Phone number has been updated.")
+    print("🔄 Phone number has been updated.")
 
 def query_users():
     print("1 - All records")
