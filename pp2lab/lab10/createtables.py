@@ -36,4 +36,4 @@ conn.commit()
 cur.close()
 conn.close()
 
-print("✅ Таблицы успешно созданы.")
+print("Tables have been created successfully")
