@@ -20,6 +20,50 @@ cur.execute("""
 """)
 conn.commit()
 
+cur.execute("""
+    CREATE OR REPLACE PROCEDURE insert_many_users(names TEXT[], surnames TEXT[], phones TEXT[], OUT invalid_records TEXT)
+    LANGUAGE plpgsql
+    AS $$
+    DECLARE
+        i INT := 1;
+        total INT := array_length(names, 1);
+        bad_entries TEXT := '';
+    BEGIN
+        WHILE i <= total LOOP
+            IF phones[i] ~ '^\d{11,12}$' THEN
+                INSERT INTO phonebook1(name, surname, phone) VALUES (names[i], surnames[i], phones[i]);
+            ELSE
+                bad_entries := bad_entries || '(' || names[i] || ', ' || surnames[i] || ', ' || phones[i] || '), ';
+            END IF;
+            i := i + 1;
+        END LOOP;
+        invalid_records := TRIM(TRAILING ', ' FROM bad_entries);
+    END;
+    $$;
+""")
+conn.commit()
+
+def insert_many_users():
+    names = []
+    surnames = []
+    phones = []
+    n = int(input("How many users to insert: "))
+    for _ in range(n):
+        name = input("Enter name: ")
+        surname = input("Enter surname: ")
+        phone = input("Enter phone: ")
+        names.append(name)
+        surnames.append(surname)
+        phones.append(phone)
+    cur.callproc("insert_many_users", (names, surnames, phones))
+    result = cur.fetchone()
+    if result and result[0]:
+        print("Invalid records:")
+        print(result[0])
+    else:
+        print("All records inserted successfully.")
+    conn.commit()
+
 def insert_from_csv(path):
     with open(path, newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -62,10 +106,24 @@ def insert_or_update_user():
         conn.commit()
         print("User inserted.")
 
+def pagination_query():
+    try:
+        limit = int(input("Enter limit (how many records to display): "))
+        offset = int(input("Enter offset (how many records to skip): "))
+        cur.execute("SELECT * FROM phonebook1 ORDER BY id LIMIT %s OFFSET %s", (limit, offset))
+        rows = cur.fetchall()
+        if rows:
+            for row in rows:
+                print(row)
+        else:
+            print("No records found for the given limit and offset.")
+    except ValueError:
+        print("Limit and offset must be integers.")
+
 def search_by_pattern(pattern):
     print("1 - Search by name pattern")
-    print("2 - Search by name pattern")
-    print("3 - Search by name pattern")
+    print("2 - Search by surname pattern")
+    print("3 - Search by phone pattern")
     print("4 - Search by common pattern")
 
     pattern1 = f"%{pattern}%"
@@ -168,7 +226,7 @@ def delete_user():
         surname = input("Enter surname: ")
         cur.execute("DELETE FROM phonebook1 WHERE name = %s and surname = %s", (name, surname))
     elif choice == "5":
-        cur.execute("TRUNCATE TABLE phonebook1;")
+        cur.execute("TRUNCATE TABLE phonebook1 RESTART IDENTITY;")
     else:
         print("Invalid choice.")
         return
@@ -186,6 +244,8 @@ def main():
         print("5. Delete user")
         print("6. Search by pattern")
         print("7. Insert / Update user")
+        print("8. Show records with pagination")
+        print("9. Insert many users manually")
         print("0. Exit")
         choice = input("Choose an option: ")
 
@@ -204,6 +264,10 @@ def main():
             search_by_pattern(pattern)
         elif choice == "7":
             insert_or_update_user()
+        elif choice == "8":
+            pagination_query()
+        elif choice == "9":
+            insert_many_users()
         elif choice == "0":
             print("Goodbye!")
             break
