@@ -163,7 +163,6 @@ def gameLoop():  # настройки и цикл самой игры
         score_apple(length - 1, level)  # параметры функции измененные
         pygame.display.update()  # обновление экрана
 
-
         for x in range(fx, fx + food_size, 5):
             for y in range(fy, fy + food_size, 5):
                 if x1 == x and y1 == y:  # если наши координаты и координаты еды будут равны мы сьедаем еду
