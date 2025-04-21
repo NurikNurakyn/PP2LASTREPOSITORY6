@@ -14,40 +14,30 @@ def get_connection():
 def get_or_create_user(username):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id FROM users WHERE username = %s", (username,))
+    cur.execute("SELECT id, level, score FROM user_scores WHERE username = %s", (username,))
     result = cur.fetchone()
     if result:
-        user_id = result[0]
+        id, level, score = result
     else:
-        cur.execute("INSERT INTO users (username) VALUES (%s) RETURNING id", (username,))
-        user_id = cur.fetchone()[0]
+        cur.execute("INSERT INTO user_scores (username, level, score) VALUES (%s, %s, %s) RETURNING id", (username, 1, 0))
+        id = cur.fetchone()[0]
         conn.commit()
-
-    cur.execute("SELECT level, score FROM user_scores WHERE user_id = %s", (user_id,))
-    score_data = cur.fetchone()
-    if not score_data:
-        cur.execute("INSERT INTO user_scores (user_id) VALUES (%s)", (user_id,))
-        conn.commit()
-        level, score = 1, 0
-    else:
-        level, score = score_data
 
     cur.close()
     conn.close()
-    return user_id, level, score
+    return id, level, score
 
-def save_game_state(user_id, level, score):
+def save_game_state(id, level, score):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
-        UPDATE user_scores 
-        SET level = %s, score = %s 
-        WHERE user_id = %s
-    """, (level, score, user_id))
+        UPDATE user_scores
+        SET level = %s, score = %s
+        WHERE id = %s
+    """, (level, score, id))
     conn.commit()
     cur.close()
     conn.close()
-
 
 pygame.init()
 
@@ -127,7 +117,7 @@ def main_menu():
     user_speed = 5
     user_level = 1
     while running:
-        screen.fill((200, 250, 200))  # постоянный фон (не менять!)
+        screen.fill((200, 250, 200))
         game_name_font = pygame.font.SysFont("Cambria", 40)
         points_font = pygame.font.SysFont("Cambria", 30)
 
@@ -233,7 +223,7 @@ def gameLoop():
 
         x1 += x1_change
         y1 += y1_change
-        screen.fill((0, 200,100))
+        screen.fill((0, 200, 100))
         draw_walls(walls)
 
         food_size = snake_position + (food_weight - 1) * 5
@@ -263,12 +253,12 @@ def gameLoop():
                     pygame.mixer.Sound.play(eat_sound)
         clock.tick(speed)
 
-    save_game_state(user_id, level, score)
+    save_game_state(id, level, score)
     pygame.quit()
     quit()
 
 username1 = input("Enter your username: ")
-user_id, user_level, user_score = get_or_create_user(username1)
+id, user_level, user_score = get_or_create_user(username1)
 
 main_menu()
 gameLoop()
