@@ -34,4 +34,5 @@ while running:
     screen.fill(WHITE)
     pygame.draw.circle(screen,RED,(x,y),r)
     pygame.display.update()
+
 pygame.quit()
