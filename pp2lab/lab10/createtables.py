@@ -22,4 +22,4 @@ cur.execute(create_user_scores_table)
 conn.commit()
 cur.close()
 conn.close()
-
+#
